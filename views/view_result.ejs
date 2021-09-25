@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/vendor/normalize-4.1.1.css" type="text/css" />
+  <link rel="stylesheet" href="/vendor/border-box.css" type="text/css" />
+  <link rel="stylesheet" href="/styles/layout.css" type="text/css" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+    integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <title>Document</title>
+</head>
+
+<script type="text/javascript">
+function copyUrl() {
+  const dummy = document.createElement('p');
+  dummy.textContent = window.location.href;
+  document.body.appendChild(dummy);
+
+  const range = document.createRange();
+  range.setStartBefore(dummy);
+  range.setEndAfter(dummy);
+
+  const selection = window.getSelection();
+  // First clear, in case the user already selected some other text
+  selection.removeAllRanges();
+  selection.addRange(range);
+
+  document.execCommand('copy');
+  document.body.removeChild(dummy);
+  alert("This url have been copied to your clipboard");
+}
+</script>
+
+<body>
+  <%- include('partials/_header') %>
+  <main>
+    <div class="score">
+      <div class="resultArea">
+      <% if (!title) { %>
+        <!--if there quiz quiz_id not exist, or if the quiz_id and attempt_id does not match but the quiz is hidden -->
+        <h2 class="wrongLink">The result of quiz you are looking for<br>
+          Is not open for public, or<br>
+          Does not exist!</h2>
+          <div class="react">
+            <form method="GET" action="/">
+              <button class="btn btn-outline-primary" type="submit">Back to Homepage</button>
+            </form>
+          </div>
+      <% } else if (!matchingQuiz) { %>
+        <!--if the attempt is not for this quiz, or attempt_id not exist-->
+        <h2 class="wrongLink">The result you are trying to get for<br>
+          The quiz: <%= title %><br>
+          Does not exist!</h2>
+          <div class="react">
+            <form method="GET" action="/quizzes/<%= quiz_id %>">
+              <button class="btn btn-outline-primary" type="submit">Attempt the quiz yourself?</button>
+            </form>
+          </div>
+      <% } else if (name && Attempter) { %>
+        <!--if the attempter is logged in and viewing his own attempt-->
+        <!--Give custom msg and color based on score-->
+        <% if (percentage === 1) { %>
+          <h2 class = "user">Congratulation, <%= name %>!</h2>
+          <p class="smaller">You have scored</p>
+          <p class="perfect"><%= score %>/<%= numOfQuestions %></p>
+          <p class="smaller">on the quiz</p>
+          <h3><%= title %></h3>
+          <p>You have achieved perfection!</p>
+        <% } else if (percentage >= 0.75) { %>
+          <h2>Congratulation, <%= name %>!</h3>
+          <p class="smaller">You have scored</p>
+          <p class="ace"><%= score %>/<%= numOfQuestions %></p>
+          <p class="smaller">on the quiz</p>
+          <h3><%= title %></h3>
+          <p>Almost perfect! One more time?</p>
+        <% } else if (percentage >= 0.5) { %>
+          <h2>Good job, <%= name %>!</h3>
+          <p class="smaller">You have scored</p>
+          <p class="pass"><%= score %>/<%= numOfQuestions %></p>
+          <p class="smaller">on the quiz</p>
+          <h3><%= title %></h3>
+          <p>Keep on going!</p>
+        <% } else { %>
+          <h2>Uhhh, <%= name %>!</h3>
+          <p class="smaller">You have scored</p>
+          <p class="fail"><%= score %>/<%= numOfQuestions %></p>
+          <p class="smaller">on the quiz</p>
+          <h3><%= title %></h3>
+          <p>You can do better! Try again!</p>
+        <% } %>
+        </div>
+        <div class="react">
+          <button class="btn btn-primary" onclick="copyUrl();">Share result?</button>
+          <form method="GET" action="/quizzes/<%= quiz_id %>">
+            <button id="btn-sapcing" class="btn btn-primary" type="submit">Try again?</button>
+          </form>
+        </div>
+      <% } else { %>
+        <!--if user is not logged in when attempt the quiz, or is viewing someone else result-->
+          <% if (name) { %>
+            <h2><%= name %></h3>
+          <% } else { %>
+            <h2>Guest</h3>
+          <% } %>
+          <p class="smaller">have scored</p>
+          <% if (percentage > 0.75) { %>
+            <p class="ace">
+          <% } else if (percentage > 0.5) { %>
+            <p class="pass">
+          <% } else { %>
+            <p class="fail">
+          <% } %>
+            <%= score %>/<%= numOfQuestions %></p>
+          <p class="smaller">on the quiz</p>
+          <h3><%= title %></h3>
+        </div>
+        <div class="react">
+          <button class="btn btn-primary" onclick="copyUrl();">Share result?</button>
+          <form method="GET" action="/quizzes/<%= quiz_id %>">
+            <button id="btn-sapcing" class="btn btn-primary" type="submit">Try this quiz?</button>
+          </form>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
+
+  </main>
+  </main>
+</body>
+
+</html>

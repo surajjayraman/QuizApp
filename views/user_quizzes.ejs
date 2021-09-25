@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>My Quizzes</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="/vendor/normalize-4.1.1.css" type="text/css" />
+    <link rel="stylesheet" href="/vendor/border-box.css" type="text/css" />
+    <link rel="stylesheet" href="/styles/user_quizzes.css" type="text/css" />
+
+    <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
+
+    <!-- function to copy url -->
+    <script type="text/javascript">
+      function copyUrl(quiz_id) {
+        const dummy = document.createElement('p');
+        const url = "http://localhost:8080/quizzes/" + quiz_id;
+        dummy.textContent = url;
+        document.body.appendChild(dummy);
+
+        const range = document.createRange();
+        range.setStartBefore(dummy);
+        range.setEndAfter(dummy);
+
+        const selection = window.getSelection();
+        // First clear, in case the user already selected some other text
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        document.execCommand('copy');
+        document.body.removeChild(dummy);
+        alert("The quiz url has been copied!");
+      }
+    </script>
+
+  </head>
+
+  <body class="all-quizzes">
+    <%- include('partials/_header') %>
+    <% if (quizzes.length > 0) { %>
+    <h1>My Quizzes</h1>
+      <table class="table table-hover">
+        <thead >
+          <tr>
+            <th scope="col" width="15%"></th>
+            <th scope="col" width="55%">Quiz</th>
+            <th scope="col" width="15%">Stats</th>
+            <th scope="col" width="15%">Manage Quiz</th>
+          </tr>
+        </thead>
+        <tbody>
+            <% for(let quiz of quizzes) { %>
+            <tr class="quiz-row">
+              <td width="15%"> <img src=<%= quiz.photo_url %> alt="Sory no image found :(" width="100" height="100"> </td>
+              <td width="55%">
+                <div class="quiz-row-title">
+                  <h4><%= quiz.title %> </h4>
+                  <p class="quiz-desc"><%= quiz.description %></p>
+                </div>
+              </td>
+              <td width="15%">
+                <div class="quiz-stats">Quiz Count: <%= quiz.total_attempts %></div>
+                <div class="quiz-stats">AVG Score: <%= quiz.average_score %></div>
+              </td>
+              <td width="15%">
+                <div class="quiz-manage-buttons">
+
+                  <!-- Manage Quiz butttons (visibility, edit, delete, share) -->
+                  <!-- Visibility function and route to be implemented a-->
+                  <form method="GET" action="/users/<%= user_id %>/quizzes/<%= quiz.id %>">
+                    <button type="submit" class="btn btn-outline-primary">View</button>
+                  </form>
+                  <!-- for now the share button will redirect to the ind quiz page -->
+                  <!-- should get a copy of the quiz url -->
+                  <form method="GET" action="/quizzes/<%= quiz.id %>" >
+                    <button id="<%= quiz.id %>" type="submit" class="btn btn-outline-success" onclick="copyUrl(this.id)">Share</button>
+                  </form>
+                  <!-- redirect to edit page -->
+                  <form method="GET" action="/users/<%= user_id %>/quizzes/<%= quiz.id %>/edit">
+                    <button type="submit" class="btn btn-outline-info" >Edit</button>
+                  </form>
+                  <!-- delete quiz from quizzes db -->
+                  <form method="POST" action="/users/<%= user_id %>/quizzes/<%= quiz.id %>/delete?_method=DELETE">
+                    <button type="submit" class="btn btn-outline-danger">Delete</button>
+                  </form>
+
+                </div>
+              </td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+    <% }  else { %>
+      <div class="all-quizzes-empty">
+        <h1>My Quizzes</h1>
+        <p>You do not have any quizzes! You can create a new quiz or go to homepage.</p>
+        <form method="GET" action="/">
+          <button type="submit" class="btn btn-primary">Go to Homepage</button>
+        </form>
+      </div>
+    <% } %>
+
+      <!-- Bootstrap JS -->
+      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+      <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
+
+
+    </body>
+    </html>
